@@ -29,29 +29,44 @@ router.get('/menu', async (req, res, next) => {
 
 router.get('/menu1', async (req, res, next) => {
 
-    console.log("in menu 2");
+    console.log("in menu 1");
     try {
-        console.log(`req.url: ${req.url}`);
-        const queryObect = url.parse(req.url, true).query;
-        console.log(`queryObect: ${queryObect}`);
+        //console.log(`req.url: ${req.url}`);
+        //const queryObect = url.parse(req.url, true).query;
+        //console.log(`queryObect: ${queryObect}`);
         
         //const search = req.querystring.q;
-        console.log(`******req.query.q = ${search}`);
+        //console.log(`******req.query.q = ${search}`);
 
+        /*
         if(req.query.q !== 'undefined') {
             //const prod = await Product.findById(search);
             console.log(`One product ${Product}`);
-        } else {
-            //console.log(`req.query.q = ${search}`);
-            const prod = await Product.find();
-            console.log(`Multiple products ${prod}`);
-        }
+        } else {} 
+        */
+        //console.log(`req.query.q = ${search}`);
+        const prod = await Product.find();
+        const clientArray = [];
+
         
-        console.log(`Before sending resp to client ${prod}`);
+        for(let i = 0; i < prod.length; i++) {
+            if((prod[i].inStock === true) && (prod[i].quantity > 0) && (prod[i].isSold === true)) {
+                console.log(`prod ${i + 1} is: ${prod[i]._id}`);
+                let temp = {product: prod[i].product, price: prod[i].price, description: prod[i].description};
+                clientArray.push(temp);
+            }
+        }
 
-        res.status(200).json(prod);
 
-    } catch(err) {
+            
+        //console.log(`Multiple products ${prod}`);
+        
+        //console.log(`Before sending resp to client ${prod}`);
+
+        //res.status(200).json(prod);
+        res.status(200).json(clientArray);
+
+    }   catch(err) {
         res.status(500).json({message: err });
     }
 
@@ -91,7 +106,7 @@ router.post('/addproduct', async (req, res, next) => {
 });
 
 //GET product from catalog
-router.get('/:productId', async (req, res, next) => {
+router.get('/:productId:name', async (req, res, next) => {
     try {
         console.log(req.params.productId);
         const prod = await Product.findById(req.params.productId);
